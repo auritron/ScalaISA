@@ -9,12 +9,18 @@
 #include "instructions.h"
 
 enum class State {
-    Ins,
-    Reg,
-    Sep,
-    Imm,
-    Cmt,
-    End,
+    OpC,    //opcode
+    Reg,    //register
+    Sep,    //seperator (,)
+    Imm,    //immediate
+    Cmt,    //comment
+    New,    //newline
+    Nil,    //none (whitespace type char)
+};
+
+enum class Action {
+    Push,
+    Emit,
 };
 
 class Register {
@@ -27,14 +33,13 @@ class Register {
 
         Register() = delete;
 
-        Register(std::string_view n, int i) : 
-            name{n}, id{i} { };
+        Register(std::string_view n, int i);
 
 };
 
 class Inst {
 
-    typedef std::optional<Register> Reg;
+    using Reg = std::optional<Register>;
 
     private:
 
@@ -43,8 +48,7 @@ class Inst {
 
     public:
 
-        Inst(OpCode i, Reg r1 = std::nullopt, Reg r2 = std::nullopt, Reg r3 = std::nullopt) :
-            instruction{i}, args{r1, r2, r3} { };
+        Inst(OpCode i, Reg r1 = std::nullopt, Reg r2 = std::nullopt, Reg r3 = std::nullopt);
 
 };
 
@@ -55,5 +59,6 @@ class Parser {
         std::vector<Inst> ir_vec;
     
     public:
-        
+
+        Parser();
 };
