@@ -7,58 +7,84 @@
 #include <optional>
 
 #include "instructions.h"
+#include "errorlist.h"
 
-enum class State {
-    OpC,    //opcode
-    Reg,    //register
-    Sep,    //seperator (,)
-    Imm,    //immediate
-    Cmt,    //comment
-    New,    //newline
-    Nil,    //none (whitespace type char)
-};
+namespace Parser { 
 
-enum class Action {
-    Push,
-    Emit,
-};
+    enum class State {
+        Idn,    //identifier mode, transition state, can be pushed as variable or opcode
+        Rgt,    //register transition state (when 'R' is detected)
+        Reg,    //register
+        Sep,    //seperator (,)
+        Imt,    //immediate transition state (when '#' is detected)
+        Imm,    //immediate
+        Lbt,    //label transition (when '@' is detected)
+        Lbl,    //label
+        Zer,    //zero prefix, transition state
+        Adr,    //address (eg. 0xDEADBEEF)
+        Cmt,    //comment (;)
+        Nil,    //none (whitespace type char)
+        Err,    //error/unknown state
+    };
 
-class Register {
-    private:
+    enum class Action {
+        Push,   //push character to buffer
+        Emit,   //emit token in buffer
+        PsEm,   //both push and emit
+        Idle,   //do nothing
+    };
 
-        std::string_view name;
-        int id;
+    class Register {
+        private:
 
-    public:
+            std::string_view name;
+            int id;
 
-        Register() = delete;
+        public:
 
-        Register(std::string_view n, int i);
+            Register() = delete;
 
-};
+            Register(std::string_view n, int i);
 
-class Inst {
+    };
 
-    using Reg = std::optional<Register>;
+    class Inst { //instruction node
 
-    private:
+        using Reg = std::optional<Register>;
 
-        OpCode instruction;
-        std::array<Reg, 3> args;
+        private:
 
-    public:
+            Instruction::OpCode instruction;
+            std::array<Reg, 3> args;
 
-        Inst(OpCode i, Reg r1 = std::nullopt, Reg r2 = std::nullopt, Reg r3 = std::nullopt);
+        public:
 
-};
+            Inst(Instruction::OpCode i, Reg r1 = std::nullopt, Reg r2 = std::nullopt, Reg r3 = std::nullopt);
 
-class Parser {
-    private:
-        State cur_state;
-        std::string buffer;
-        std::vector<Inst> ir_vec;
-    
-    public:
+    };
 
-        Parser();
-};
+    class Tokenizer {
+        
+        private:
+            State cur_state;
+            Action cur_action;
+            std::string buffer;
+            char cur_ch;
+            size_t ch_count;    //characters counted from input
+            
+        public:
+
+            std::vector<Inst> ir_vec;
+
+            Tokenizer();
+            void tokenize();
+            Inst create_inst();
+            std::optional<Instruction::OpCode> match_token();
+            void set_state();
+            void set_action();
+            void raise_parsing_error(Error::ParsingError e);
+
+    };
+
+}
+
