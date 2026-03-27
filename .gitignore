@@ -42,3 +42,6 @@
 
 #text
 *.txt
+
+#.vscode directory
+/.vscode/
