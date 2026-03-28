@@ -71,6 +71,10 @@ namespace Parser {
             std::string buffer;
             unsigned char cur_ch;
             size_t ch_count;    //characters counted from input
+            size_t line_count;
+            size_t col_count;
+            bool error_detected;
+            bool error_in_line; //check if the pointer is still in the line where the error is detected
             
         public:
 

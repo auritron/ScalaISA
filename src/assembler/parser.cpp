@@ -23,6 +23,10 @@ Tokenizer::Tokenizer() :
     buffer{""},
     cur_ch{0},
     ch_count{0},
+    line_count{0},
+    col_count{0},
+    error_detected{false},
+    error_in_line{false},
     ir_vec{}
 { }
 
@@ -187,8 +191,10 @@ void Tokenizer::set_state() {
                     case State::Lbt:
                     case State::Lbl:
                         cur_state = State::Lbl;
+                        break;
                     case State::Zer:
                         raise_parsing_error(ParseErr::ImmediateValueError);
+                        break;
                     case State::Adr:
                         cur_state = State::Adr;
                         break;
@@ -206,6 +212,7 @@ void Tokenizer::set_state() {
                     case State::Sep:
                     case State::Nil:
                         cur_state = State::Idn;
+                        break;
                     case State::Imm:
                     case State::Imt:
                         raise_parsing_error(ParseErr::ImmediateValueError);
@@ -218,8 +225,9 @@ void Tokenizer::set_state() {
                     case State::Adr:
                         if ((cur_ch >= 'A' && cur_ch <= 'F') || (cur_ch >= 'a' && cur_ch <= 'f')) { //if between A-F or a-f
                             cur_state = State::Adr;
+                        } else {
+                            raise_parsing_error(ParseErr::IdentifierNamingError);
                         }
-                        raise_parsing_error(ParseErr::IdentifierNamingError);
                         break;
                     case State::Cmt:
                     case State::Err:
@@ -244,6 +252,14 @@ void Tokenizer::tokenize() {
     set_state();
     set_action();
     create_inst();
+
+    if (cur_ch == '\n') {
+        ++line_count;
+        col_count = 0;
+        error_in_line = false;
+    } else {
+        ++col_count;
+    }
 }
 
 void Tokenizer::raise_parsing_error(ParseErr e) {
