@@ -27,7 +27,7 @@ Tokenizer::Tokenizer() :
     line_count{0},
     col_count{0},
     error_detected{false},
-    ir_vec{}
+    pipeline{}
 { }
 
 void Tokenizer::set_state() {
@@ -46,7 +46,7 @@ void Tokenizer::set_state() {
 
             cur_state = State::Adt;
 
-        } else if (std::isspace(cur_ch)) {
+        } else if (std::isspace(cur_ch)) { //simple state machine lmao
 
             switch (cur_state) {
                 case State::Idn:

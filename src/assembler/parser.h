@@ -73,7 +73,7 @@ namespace Parser {
 
     };
 
-    class Inst { //instruction node
+    class Inst { //instruction node, changing this soon too
 
         using Reg = std::optional<Register>;
 
@@ -103,7 +103,7 @@ namespace Parser {
             
         public:
 
-            std::vector<Inst> ir_vec;
+            std::vector<Inst> pipeline;
 
             Tokenizer();
             void tokenize();
