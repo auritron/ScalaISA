@@ -1,9 +1,13 @@
 #pragma once
 
+#include <array>
 #include <unordered_map>
+#include <string>
 #include <string_view>
+#include <optional>
+#include <variant>
 
-namespace Instruction {
+namespace instruction_mod {
 
     enum class TokenType {
         OpCode,
@@ -71,42 +75,38 @@ namespace Instruction {
     };
 
     // Opcode : number of args
-    static const std::unordered_map<std::string_view, OpCode> instruction_map {
-        { "LOAD",   OpCode::LOAD },
-        { "SEND",   OpCode::SEND },
-        { "COPY",   OpCode::COPY },
-        { "SET",    OpCode::SET },
-        { "SWAP",   OpCode::SWAP },
-        { "NOT",    OpCode::NOT },
-        { "AND",    OpCode::AND },
-        { "OR",     OpCode::OR },
-        { "XOR",    OpCode::XOR },
-        { "STL",    OpCode::STL },
-        { "STR",    OpCode::STR },
-        { "RTL",    OpCode::RTL },
-        { "RTR",    OpCode::RTR },
-        { "ADD",    OpCode::ADD },
-        { "SUB",    OpCode::SUB },
-        { "MUL",    OpCode::MUL },
-        { "DIV",    OpCode::DIV },
-        { "MOD",    OpCode::MOD },
-        { "NEG",    OpCode::NEG },
-        { "CMP",    OpCode::CMP },
-        { "GOTO",   OpCode::GOTO },
-        { "WEQ",    OpCode::WEQ },
-        { "WGT",    OpCode::WGT },
-        { "WLT",    OpCode::WLT },
-        { "WCY",    OpCode::WCY },
-        { "WOV",    OpCode::WOV },
-        { "WDZ",    OpCode::WDZ },
-        { "CAL",    OpCode::CAL },
-        { "RET",    OpCode::RET },
-        { "PUSH",   OpCode::PUSH },
-        { "POP",    OpCode::POP },
-        { "PRINT",  OpCode::PRINT },
-        { "PRINTC", OpCode::PRINTC },
-        { "END",    OpCode::END },
-        { "CLR",    OpCode::CLR },
+    extern const std::unordered_map<std::string_view, OpCode> instruction_map; //defined in instruction.cpp
+
+    class Token {
+
+        public:
+
+            TokenType token_type;
+            std::variant<OpCode, int, std::string> value;
+
+            Token();
+            Token(TokenType type, OpCode val);
+            Token(TokenType type, int val);
+            Token(TokenType type, std::string val);
+            
+    };
+
+    class Inst {
+
+        public:
+
+            static constexpr int INST_SIZE = 4;
+            size_t used_size;
+
+        private:
+
+            std::array<std::optional<Token>, INST_SIZE> token_arr;
+
+        public:
+
+            Inst();
+            bool push_token(Token&& token);
+
     };
 
 }

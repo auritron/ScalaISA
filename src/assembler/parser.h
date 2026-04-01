@@ -2,18 +2,14 @@
 
 #include <cctype>
 #include <string>
-#include <string_view>
-#include <array>
 #include <vector>
-#include <optional>
 #include <unordered_map>
 #include <stdexcept>
-#include <variant>
 
 #include "instructions.h"
 #include "errorlist.h"
 
-namespace Parser { 
+namespace parser_mod { 
 
     enum class State {
         Idn,    //identifier mode, transition state, can be pushed as variable or opcode
@@ -40,59 +36,12 @@ namespace Parser {
         None,
     };
 
-    static const std::unordered_map<State, StateType> state_map {
-        { State::Idn, StateType::Word },
-        { State::Reg, StateType::Word },
-        { State::Imm, StateType::Word },
-        { State::Lbl, StateType::Word },
-        { State::Adr, StateType::Word },
-        { State::Rgt, StateType::RTransition },
-        { State::Imt, StateType::Transition },
-        { State::Lbt, StateType::Transition },
-        { State::Adt, StateType::Transition },
-        { State::Zer, StateType::Transition },
-        { State::Sep, StateType::Separator },
-        { State::Cmt, StateType::None },
-        { State::Nil, StateType::None },
-        { State::Err, StateType::None },
-    };
+    extern const std::unordered_map<State, StateType> state_map; //defined in parser.cpp
 
     enum class Action {
         Push,   //push character to buffer
         Emit,   //emit token in buffer
         Idle,   //do nothing
-    };
-
-    class Token {
-
-        public:
-
-            Instruction::TokenType token_type;
-            std::variant<Instruction::OpCode, int, std::string> value;
-
-            Token();
-            Token(Instruction::TokenType type, Instruction::OpCode val);
-            Token(Instruction::TokenType type, int val);
-            Token(Instruction::TokenType type, std::string val);
-            
-    };
-    
-    class Inst {   //unvalidated parser generated instructions
-
-        public:
-
-            static constexpr int INST_SIZE = 4;
-            size_t used_size;
-
-        private:
-
-            std::array<std::optional<Token>, INST_SIZE> token_arr;
-
-        public:
-
-            Inst();
-            bool push_token(Token&& token);
-
     };
 
     class Tokenizer {
@@ -102,7 +51,7 @@ namespace Parser {
             State prev_state;
             Action cur_action;
             std::string buffer;
-            Inst cur_inst;
+            instruction_mod::Inst cur_inst;
             unsigned char cur_ch;
             size_t ch_count;    //characters counted from input
             size_t line_count;
@@ -110,14 +59,11 @@ namespace Parser {
             
         public:
 
-            std::vector<Inst> pipeline;
-
             Tokenizer();
-            void tokenize(); //!
-            std::optional<Instruction::OpCode> match_token();
+            void tokenize(assembler_mod::Assembler::Pipeline& pipeline); //!
             void set_state(); //:D
             void set_action(); //:D
-            void execute(); //:D
+            void execute(assembler_mod::Assembler::Pipeline& pipeline); //:D
             void raise_parsing_error(Error::ParsingError e); //!
 
     };

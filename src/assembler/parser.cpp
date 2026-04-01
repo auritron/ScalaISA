@@ -1,23 +1,29 @@
+#include "assembler.h"
 #include "parser.h"
 #include "errorlist.h"
 
-using namespace Parser;
+using namespace parser_mod;
 
 using ParseErr = Error::ParsingError;
 
-Token::Token(Instruction::TokenType type, Instruction::OpCode val) :
-    token_type{type}, value{val} { }
-Token::Token(Instruction::TokenType type, int val) :
-    token_type{type}, value{val} { }
-Token::Token(Instruction::TokenType type, std::string val) :
-    token_type{type}, value{val} { }
+const std::unordered_map<State, StateType> state_map {
+    { State::Idn, StateType::Word },
+    { State::Reg, StateType::Word },
+    { State::Imm, StateType::Word },
+    { State::Lbl, StateType::Word },
+    { State::Adr, StateType::Word },
+    { State::Rgt, StateType::RTransition },
+    { State::Imt, StateType::Transition },
+    { State::Lbt, StateType::Transition },
+    { State::Adt, StateType::Transition },
+    { State::Zer, StateType::Transition },
+    { State::Sep, StateType::Separator },
+    { State::Cmt, StateType::None },
+    { State::Nil, StateType::None },
+    { State::Err, StateType::None },
+};
 
-Inst::Inst() :
-    token_arr{std::nullopt},
-    used_size{0}
-{ }
-
-bool Inst::push_token(Token&& token) {
+bool instruction_mod::Inst::push_token(Token&& token) {
     if (used_size < INST_SIZE) {
         token_arr[used_size] = std::move(token);
         ++used_size;
@@ -35,8 +41,7 @@ Tokenizer::Tokenizer() :
     cur_ch{0},
     ch_count{0},
     line_count{0},
-    col_count{0},
-    pipeline{}
+    col_count{0}
 { }
 
 void Tokenizer::set_state() {
@@ -289,11 +294,11 @@ void Tokenizer::set_state() {
 
 void Tokenizer::set_action() {
 
-    switch ( Parser::state_map.at(prev_state) ) {
+    switch ( state_map.at(prev_state) ) {
 
         case StateType::Word:
         case StateType::RTransition:
-            switch ( Parser::state_map.at(cur_state) ) {
+            switch ( state_map.at(cur_state) ) {
                 case StateType::Word:
                     cur_action = Action::Push;
                     break;
@@ -309,7 +314,7 @@ void Tokenizer::set_action() {
             break;
 
         case StateType::Transition:
-            switch ( Parser::state_map.at(cur_state) ) {
+            switch ( state_map.at(cur_state) ) {
                 case StateType::Word:
                     cur_action = Action::Push;
                     break;
@@ -321,7 +326,7 @@ void Tokenizer::set_action() {
 
         case StateType::Separator:
         case StateType::None:
-            switch ( Parser::state_map.at(cur_state) ) {
+            switch ( state_map.at(cur_state) ) {
                 case StateType::Separator:
                 case StateType::None:
                     cur_action = Action::Idle;
@@ -335,9 +340,9 @@ void Tokenizer::set_action() {
 
 }
 
-void Tokenizer::execute() {
+void Tokenizer::execute(assembler_mod::Assembler::Pipeline& pipeline) {
         
-    Token token;
+    instruction_mod::Token token;
     switch (cur_action) {
 
     case Action::Push:
@@ -350,9 +355,9 @@ void Tokenizer::execute() {
         switch (prev_state) {
             case State::Idn:
                 try {
-                    token = Token(Instruction::TokenType::OpCode, Instruction::instruction_map.at(buffer)); //tt
+                    token = instruction_mod::Token(instruction_mod::TokenType::OpCode, instruction_mod::instruction_map.at(buffer)); //tt
                 } catch (const std::out_of_range& e) {
-                    token = Token(Instruction::TokenType::Variable, buffer); //sv
+                    token = instruction_mod::Token(instruction_mod::TokenType::Variable, buffer); //sv
                 }
                 break;
             case State::Reg:
@@ -362,11 +367,11 @@ void Tokenizer::execute() {
                     int val = std::stoi(buffer.substr(1), &pos);
                     if (pos != (buffer.size() - 1)) throw std::invalid_argument("Not completely int!");
                     switch (prev_state) {
-                        case State::Reg: token = Token(Instruction::TokenType::Register, val); break; //account for error handling
-                        case State::Imm: token = Token(Instruction::TokenType::Immediate, val); break;
+                        case State::Reg: token = instruction_mod::Token(instruction_mod::TokenType::Register, val); break; //account for error handling
+                        case State::Imm: token = instruction_mod::Token(instruction_mod::TokenType::Immediate, val); break;
                     }
                 } catch (const std::invalid_argument& e) { //shouldnt happen ideally
-                    token = Token(Instruction::TokenType::Invalid, 0);
+                    token = instruction_mod::Token(instruction_mod::TokenType::Invalid, 0);
                 } catch (const std::out_of_range& e) {
                     switch (prev_state) {
                         case State::Reg: raise_parsing_error(ParseErr::RegisterOutOfRange); break;
@@ -379,15 +384,15 @@ void Tokenizer::execute() {
                     size_t pos;
                     int val = std::stoi(buffer.substr(2), &pos, 16); //hex code
                     if (pos != (buffer.size() - 2)) throw std::invalid_argument("Not completely hex!");
-                    token = Token(Instruction::TokenType::Address, val); //account for error handling
+                    token = instruction_mod::Token(instruction_mod::TokenType::Address, val); //account for error handling
                 } catch (const std::invalid_argument& e) { //shouldnt happen ideally
-                    token = Token(Instruction::TokenType::Invalid, 0);
+                    token = instruction_mod::Token(instruction_mod::TokenType::Invalid, 0);
                 } catch (const std::out_of_range& e) {
                     raise_parsing_error(ParseErr::AddressOutOfRange);
                 }
                 break;
             case State::Lbl:
-                token = Token(Instruction::TokenType::Label, buffer.substr(1));
+                token = instruction_mod::Token(instruction_mod::TokenType::Label, buffer.substr(1));
                 break;
             default:
                 std::abort();
@@ -405,13 +410,13 @@ void Tokenizer::execute() {
 
 }
 
-void Tokenizer::tokenize() {
+void Tokenizer::tokenize(assembler_mod::Assembler::Pipeline& pipeline) {
 
     try {
         if (cur_state != State::Err && cur_state != State::Cmt) {
             set_state(); // set state
             set_action(); 
-            execute();
+            execute(pipeline);
         }
     } catch (const ParseErr& e) {
         cur_state = State::Err;
@@ -421,7 +426,7 @@ void Tokenizer::tokenize() {
     if (cur_ch == '\n') {
         if (cur_state != State::Err && cur_inst.used_size != 0) {
             pipeline.push_back(std::move(cur_inst));
-            cur_inst = Inst();
+            cur_inst = instruction_mod::Inst();
         }
         ++line_count;
         col_count = 0;
