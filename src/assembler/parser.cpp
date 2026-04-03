@@ -430,7 +430,7 @@ namespace parser_mod {
 
     }
 
-    void Parser::tokenize(std::vector<instruction_mod::Inst>& pipeline, char current_char) {
+    void Parser::tokenize(std::vector<instruction_mod::Inst>& pipeline, const char current_char) {
 
         cur_ch = current_char;
 
