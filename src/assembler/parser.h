@@ -58,7 +58,7 @@ namespace parser_mod {
             size_t col_count;
             
         public:
-
+            
             Parser();
             void tokenize(std::vector<instruction_mod::Inst>& pipeline, char cur_char); //!
             void set_state(); //:D

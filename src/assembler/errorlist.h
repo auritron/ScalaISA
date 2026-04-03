@@ -12,6 +12,7 @@ namespace Error {
         ImmediateValueTooBig,
         AddressOutOfRange,
         InstructionTooLong,
+        ContinuousSeperatorError,
     };
 
 }
