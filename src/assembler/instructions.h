@@ -43,12 +43,12 @@ namespace instruction_mod {
         RTR,
 
         //  arithmetic
+        NEG,
         ADD,
         SUB,
         MUL,
         DIV,
         MOD,
-        NEG,
 
         //  comparison and branching
         CMP,
