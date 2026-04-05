@@ -6,7 +6,7 @@ using instruction_mod::TokenType;
 namespace analyzer_mod {
 
     const ValidationMap validation_map {
-        { OpCode::LOAD, {  } }
+        { OpCode::LOAD, { {}, {} } }
     };
 
 }

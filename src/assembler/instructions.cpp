@@ -1,4 +1,5 @@
 #include "instructions.h"
+#include "../overload.hpp"
 
 namespace instruction_mod {
 
@@ -48,6 +49,21 @@ namespace instruction_mod {
         token_type{type}, value{val} { }
     Token::Token(TokenType type, std::string val) :
         token_type{type}, value{val} { }
+
+    TokenOpt::TokenOpt(TokenType token) :
+        token_opt_list(std::move(token))
+    { }
+
+    TokenOpt::TokenOpt(std::initializer_list<TokenType> tokens) :
+        token_opt_list(std::unordered_set<TokenType>(tokens))
+    { }
+
+    bool TokenOpt::token_type_exists(TokenType target) const {
+        return std::visit(overload {
+            [target](TokenType token) { return token == target; },
+            [target](const std::unordered_set<TokenType>& tokens) { return tokens.contains(target); },
+        }, token_opt_list);
+    }
 
     Inst::Inst() :
         token_arr{std::nullopt},

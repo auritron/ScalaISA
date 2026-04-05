@@ -23,13 +23,13 @@ void Assembler::assemble_prog(instruction_mod::Pipeline& pipeline, const std::st
     parser.tokenize(pipeline, '\n'); //add \n sentinel
 }
 
-void Assembler::dbg_display_parse_tokens(const instruction_mod::Pipeline& pipeline) {
+void Assembler::dbg_display_parse_tokens(const instruction_mod::Pipeline& pipeline) const {
 
     for (int i{0}; i < pipeline.size(); i++) {
         std::cout << "Instruction No. " << i + 1 << ": ";
-        auto cur_inst{pipeline[i]};
+        const auto& cur_inst{pipeline[i]};
         for (int j{0}; j < cur_inst.INST_SIZE; j++) {
-            auto cur_token{cur_inst.token_arr[j]};
+            const auto& cur_token{cur_inst.token_arr[j]};
             if (cur_token.has_value()) {
                 std::cout << magic_enum::enum_name(cur_token->token_type) << " : ";
                 std::visit(overload {

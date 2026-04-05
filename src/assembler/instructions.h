@@ -2,11 +2,13 @@
 
 #include <array>
 #include <vector>
+#include <unordered_set>
 #include <unordered_map>
 #include <string>
 #include <string_view>
 #include <optional>
 #include <variant>
+#include <initializer_list>
 
 namespace instruction_mod {
 
@@ -92,6 +94,20 @@ namespace instruction_mod {
             Token(TokenType type, int val);
             Token(TokenType type, std::string val);
             
+    };
+
+    class TokenOpt {
+
+        private:
+            
+            std::variant<TokenType, std::unordered_set<TokenType>> token_opt_list;
+
+        public:
+
+            TokenOpt(TokenType token);
+            TokenOpt(std::initializer_list<TokenType> tokens);
+            bool token_type_exists(TokenType target) const;
+
     };
 
     class Inst {
