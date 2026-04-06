@@ -17,6 +17,7 @@ namespace Error {
     enum class SemanticError {
         MissingOpCodeError,
         IncorrectFirstToken,
+        IncorrectOperandFmt,
     };
 
 }

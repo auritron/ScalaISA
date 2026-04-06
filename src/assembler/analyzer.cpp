@@ -83,11 +83,31 @@ namespace analyzer_mod {
         error_detected{err_detected}
     { }
 
-    void Analyzer::validate_opcode(const instruction_mod::Inst& inst) const {
+    bool Analyzer::validate_opcode(const instruction_mod::Inst& inst, instruction_mod::OpCode opcode) const {
+
+        const auto opc_pattern = instruction_fmt.find(opcode);
+        if (opc_pattern == instruction_fmt.end()) {
+            std::abort(); //change this to a panic function with error message.
+        } else { 
+            for (int tkn{1}; tkn < instruction_mod::Inst::INST_SIZE; tkn++) {
+                const auto& cur_token = inst.token_arr[tkn];
+                const auto& cur_target = (opc_pattern->second)[tkn-1];
+                if (cur_token.has_value() == cur_target.has_value()) {
+                    if (cur_token.has_value() && !cur_target.value().token_type_exists(cur_token->token_type)) {
+                        raise_semantic_error(Error::SemanticError::IncorrectOperandFmt);
+                        return false;
+                    }
+                } else {
+                    raise_semantic_error(Error::SemanticError::IncorrectOperandFmt);
+                    return false;
+                }
+            }
+        }
+        return true;
         
     }
 
-    void Analyzer::analyze(const instruction_mod::Inst& inst) {
+    bool Analyzer::analyze(const instruction_mod::Inst& inst) const {
         const auto& first_token = inst.token_arr[0];
         if (!first_token.has_value()) { //check if first token exists, should not happen ideally but still
             raise_semantic_error(Error::SemanticError::MissingOpCodeError);
@@ -105,5 +125,7 @@ namespace analyzer_mod {
             }
         }
     };
+
+    
 
 }
