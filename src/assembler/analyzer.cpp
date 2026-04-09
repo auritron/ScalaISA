@@ -136,15 +136,17 @@ namespace analyzer_mod {
             std::abort(); //change this to a panic function with error message.
         } else { 
             for (int tkn{1}; tkn < instruction_mod::Inst::INST_SIZE; tkn++) {
+
                 const auto& cur_token = inst.token_arr[tkn];
                 const auto& cur_target = (opc_pattern->second)[tkn-1];
-                if (cur_token.has_value() == cur_target.has_value()) {
-                    if (cur_token.has_value() && !cur_target.value().token_type_exists(cur_token->token_type)) {
-                        return std::unexpected(SemErr::IncorrectOperandFmt);
-                    }
-                } else {
+
+                if (cur_token.has_value() != cur_target.has_value()) {
                     return std::unexpected(SemErr::IncorrectOperandFmt);
                 }
+                if (cur_token.has_value() && !cur_target->token_type_exists(cur_token->token_type)) {
+                    return std::unexpected(SemErr::IncorrectOperandFmt);
+                }
+
             }
         }
         return {};
