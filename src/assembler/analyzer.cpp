@@ -84,6 +84,10 @@ namespace analyzer_mod {
         error_detected{err_detected}
     { }
 
+    std::expected<void, SemErr> Analyzer::scout_lbl(const instruction_mod::Token& token) const {
+        return {};
+    }
+
     std::expected<void, SemErr> Analyzer::validate_token(const instruction_mod::Token& token) const { //only checked for positions 2 to INSTSIZE
         return std::visit(overload{
             [&token](OpCode) -> std::expected<void, SemErr> { //shouldn't happen ideally
@@ -135,7 +139,7 @@ namespace analyzer_mod {
         if (opc_pattern == instruction_fmt.end()) {
             std::abort(); //change this to a panic function with error message.
         } else { 
-            for (int tkn{1}; tkn < instruction_mod::Inst::INST_SIZE; tkn++) {
+            for (int tkn{1}; tkn < instruction_mod::Inst::INST_SIZE; ++tkn) {
 
                 const auto& cur_token = inst.token_arr[tkn];
                 const auto& cur_target = (opc_pattern->second)[tkn-1];

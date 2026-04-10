@@ -14,7 +14,7 @@ Assembler::Assembler() :
 
 void Assembler::assemble_prog(instruction_mod::Pipeline& pipeline, const std::string& file) {
     auto parser = parser_mod::Parser();
-    for (int pos{0}; pos < file.size(); pos++) {
+    for (int pos{0}; pos < file.size(); ++pos) {
         auto parse_success = parser.parse(pipeline, file[pos]);
         if (!parse_success) { if (!error_detected) error_detected = true; log_error(parse_success.error()); };
         //debugging purpose only
@@ -30,7 +30,7 @@ void Assembler::assemble_prog(instruction_mod::Pipeline& pipeline, const std::st
 
     if (!pipeline.empty()) {
         auto analyzer = analyzer_mod::Analyzer(false);
-        for (int inst_no{0}; inst_no < pipeline.size(); inst_no++) {
+        for (int inst_no{0}; inst_no < pipeline.size(); ++inst_no) {
             analyzer.analyze(pipeline[inst_no]);
         }
     }
@@ -38,10 +38,10 @@ void Assembler::assemble_prog(instruction_mod::Pipeline& pipeline, const std::st
 
 void Assembler::dbg_display_parse_tokens(const instruction_mod::Pipeline& pipeline) const {
 
-    for (int i{0}; i < pipeline.size(); i++) {
+    for (int i{0}; i < pipeline.size(); ++i) {
         std::cout << "Instruction No. " << i + 1 << ": ";
         const auto& cur_inst{pipeline[i]};
-        for (int j{0}; j < cur_inst.INST_SIZE; j++) {
+        for (int j{0}; j < cur_inst.INST_SIZE; ++j) {
             const auto& cur_token{cur_inst.token_arr[j]};
             if (cur_token.has_value()) {
                 std::cout << magic_enum::enum_name(cur_token->token_type) << " : ";
