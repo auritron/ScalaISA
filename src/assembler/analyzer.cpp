@@ -120,7 +120,7 @@ namespace analyzer_mod {
             [&token](int tkn_i) -> std::expected<void, SemErr> { 
                 switch (token.token_type) {
                     case TT::Register:
-                        if (tkn_i < 0 || tkn_i > instruction_mod::Inst::MAX_REG_COUNT) {
+                        if (tkn_i < 0 || tkn_i >= instruction_mod::Inst::MAX_REG_COUNT) {
                             return std::unexpected(SemErr::RegisterOutOfRange);
                         } else {
                             return {};
