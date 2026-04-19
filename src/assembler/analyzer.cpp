@@ -18,8 +18,6 @@ namespace analyzer_mod {
     inline Fmt Reg() { return DefineFmt( OPT(TT::Register), std::nullopt, std::nullopt ); }
     inline Fmt RegAdr() { return DefineFmt( OPT(TT::Register), OPT({TT::Address, TT::Variable}), std::nullopt ); }
     inline Fmt AdrReg() { return DefineFmt( OPT({TT::Address, TT::Variable}), OPT(TT::Register), std::nullopt ); }
-    inline Fmt RegReg() { return DefineFmt( OPT(TT::Register), OPT(TT::Register), std::nullopt ); }
-    inline Fmt RegImm() { return DefineFmt( OPT(TT::Register), OPT(TT::Immediate), std::nullopt ); }
     inline Fmt RegRgI() { return DefineFmt( OPT(TT::Register), OPT({TT::Register, TT::Immediate}), std::nullopt); }
     inline Fmt RgIRgI() { return DefineFmt( OPT({TT::Register, TT::Immediate}), OPT({TT::Register, TT::Immediate}), std::nullopt); }
     inline Fmt RegRegRgI() { return DefineFmt( OPT(TT::Register), OPT(TT::Register), OPT({TT::Register, TT::Immediate}) ); }
@@ -31,8 +29,7 @@ namespace analyzer_mod {
         //  memory and registers
         { OpCode::LOAD, RegAdr() },
         { OpCode::SEND, AdrReg() },
-        { OpCode::COPY, RegReg() },
-        { OpCode::SET,  RegImm() },
+        { OpCode::SET,  RegRgI() },
 
         //  bitwise
         { OpCode::NOT,  RegRgI() },

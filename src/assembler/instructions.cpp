@@ -6,7 +6,6 @@ namespace instruction_mod {
     const std::unordered_map<std::string_view, OpCode> instruction_map {
         { "LOAD",   OpCode::LOAD },
         { "SEND",   OpCode::SEND },
-        { "COPY",   OpCode::COPY },
         { "SET",    OpCode::SET },
         { "NOT",    OpCode::NOT },
         { "AND",    OpCode::AND },

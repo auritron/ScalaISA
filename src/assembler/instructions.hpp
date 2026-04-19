@@ -28,7 +28,6 @@ namespace instruction_mod {
         //  memory and registers
         LOAD,
         SEND,
-        COPY,
         SET,
 
         //  bitwise

@@ -1,10 +1,7 @@
-@LABEL
-LOAD R0 x
-SEND x R1
-ADD R0 R1 R2
-ADD x x x
-COPY R0 R15
-SEND x R5
-XOR R1 R2 #223
-XOR R2 R3
-WEQ @LABEL
+@START
+LOAD R0 0xFF
+CAL @MISSING    ; invalid - undefined label
+ADD R16 R1 R2   ; invalid - register out of range
+CMP R0 #65536   ; invalid - immediate out of range
+XOR R0 R1       ; invalid - missing operand
+END
