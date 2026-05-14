@@ -1,7 +1,16 @@
-@START
-LOAD R0 0xFF
-CAL @MISSING    ; invalid - undefined label
-ADD R16 R1 R2   ; invalid - register out of range
-CMP R0 #65536   ; invalid - immediate out of range
-XOR R0 R1       ; invalid - missing operand
-END
+GOTO @OPERATIONS
+@RET
+GOTO @END
+
+@OPERATIONS
+	LOAD R5 x
+	LOAD R6 y
+	ADD R0 R5 R6
+	SEND R5 x
+	SUB R1 R5 R6
+	SEND R1 y
+	RTR R1 R5 R6
+	GOTO @RET
+	RET
+
+@END

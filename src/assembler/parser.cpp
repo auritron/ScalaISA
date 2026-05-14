@@ -88,6 +88,10 @@ namespace parser_mod {
                 case State::Imm:
                     return std::unexpected(ParseErr::ImmediateValueError);
                     break;
+                case State::Lbt:
+                case State::Lbl:
+                    cur_state = State::Lbl;
+                    break;
                 case State::Zer:
                     return std::unexpected(ParseErr::IdentifierNamingError);
                     break;
