@@ -17,8 +17,8 @@
 
 ## J-instruction
 - Jumping and Branching  
-- OPCODE @LABEL
-- WEQ, WGT, WLT, WCY, WOV, WDZ, GOTO, CAL  
+- OPCODE @LABEL  
+- WEQ, WNE, WGT, WLT, WCY, WOV, WDZ, GOTO, CAL  
 
 ## S-instruction
 - Single Register Operation  
@@ -72,6 +72,7 @@ MOD  Rdst, Rax, Rbx
 CMP  Rax, Rbx  
 GOTO @LBL  
 WEQ  @LBL  
+WNE  @LBL
 WGT  @LBL  
 WLT  @LBL  
 WCY  @LBL  
@@ -151,6 +152,7 @@ CLR
 
 ## J-instruction
 - WEQ  - 100 00000  
+- WNE  - 100 00001   
 - WGT  - 100 00010  
 - WLT  - 100 00011  
 - WCY  - 100 00100  
