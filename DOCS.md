@@ -3,7 +3,7 @@
 ## R-instruction
 - Register only  
 - OPCODE REG REG (REG)  
-- SET, NOT, AND, OR, XOR, STL, STR, RTL, RTR, ADD, SUB, MUL, DIV, MOD, CMP  
+- SET, NOT, AND, OR, XOR, STL, STR, RTL, RTR, NEG, ADD, SUB, MUL, DIV, MOD, CMP  
 
 ## I-instruction
 - Register + Immediate  
@@ -91,3 +91,75 @@ PRINTC Rsrc
 ## misc. and debugging
 END  
 CLR  
+
+# OpCode Binary Codes
+
+## Instruction Types - (first 3 bits)
+- R - 000  
+- I - 001  
+- M - 010  
+- S - 011  
+- J - 100  
+- N - 101  
+
+## OpCodes - (3 bits from instruction type + 5 bits for instruction)
+
+### R-types -
+- SET - 000 10000  
+- NOT - 000 00000  
+- AND - 000 00001  
+- OR  - 000 00010  
+- XOR - 000 00011  
+- STL - 000 00100  
+- STR - 000 00101  
+- RTL - 000 00110  
+- RTR - 000 00111  
+- NEG - 000 01000  
+- ADD - 000 01010  
+- SUB - 000 01011  
+- MUL - 000 01100  
+- DIV - 000 01110  
+- MOD - 000 01111  
+- CMP - 000 10001  
+
+### I-types -
+- SET - 001 10000  
+- NOT - 001 00000  
+- AND - 001 00001  
+- OR  - 001 00010  
+- XOR - 001 00011  
+- STL - 001 00100  
+- STR - 001 00101  
+- RTL - 001 00110  
+- RTR - 001 00111  
+- ADD - 001 01010  
+- SUB - 001 01011  
+- MUL - 001 01100  
+- DIV - 001 01110  
+- MOD - 001 01111  
+- CMP - 001 10001  
+
+### M-types -
+- LOAD - 010 00000  
+- SEND - 010 00001  
+
+### S-types -
+- PUSH - 011 00000  
+- POP  - 011 00001  
+- PRINT - 011 10000  
+- PRINTC - 011 10001  
+
+## J-instruction
+- WEQ  - 100 00000  
+- WGT  - 100 00010  
+- WLT  - 100 00011  
+- WCY  - 100 00100  
+- WOV  - 100 00101  
+- WDZ  - 100 00110  
+- GOTO - 100 01000  
+- CAL  - 100 01001  
+
+## N-instruction
+- RET - 101 00000
+- END - 101 11111
+- CLR - 101 10000

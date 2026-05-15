@@ -24,6 +24,7 @@ namespace instruction_mod {
         { "CMP",    OpCode::CMP },
         { "GOTO",   OpCode::GOTO },
         { "WEQ",    OpCode::WEQ },
+        { "WNE",    OpCode::WNE },
         { "WGT",    OpCode::WGT },
         { "WLT",    OpCode::WLT },
         { "WCY",    OpCode::WCY },

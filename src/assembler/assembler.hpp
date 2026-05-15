@@ -2,7 +2,7 @@
 
 #include <vector>
 #include <iostream>
-#include <magic_enum/magic_enum.hpp>
+#include <magic_enum/magic_enum.hpp> //debugging
 
 #include "instructions.hpp"
 #include "error.hpp"

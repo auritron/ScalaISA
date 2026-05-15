@@ -54,6 +54,7 @@ namespace analyzer_mod {
         { OpCode::CMP,  RgIRgI() },
         { OpCode::GOTO, Lbl() },
         { OpCode::WEQ,  Lbl() },
+        { OpCode::WNE,  Lbl() },
         { OpCode::WLT,  Lbl() },
         { OpCode::WGT,  Lbl() },
         { OpCode::WCY,  Lbl() },

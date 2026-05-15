@@ -54,6 +54,7 @@ namespace instruction_mod {
         CMP,
         GOTO,
         WEQ,
+        WNE,
         WGT,
         WLT,
         WCY,
