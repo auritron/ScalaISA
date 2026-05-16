@@ -32,6 +32,7 @@ namespace analyzer_mod {
             std::expected<void, SemErr> validate_token(const instruction_mod::Token& token) const; // :D
             std::expected<void, SemErr> validate_opcode(instruction_mod::Inst& inst, instruction_mod::OpCode opcode) const; // :D
             std::expected<void, SemErr> analyze(instruction_mod::Inst& inst) const; // :D
+            void RI_inst_classify(instruction_mod::Inst& inst) const; // !
 
     };
 

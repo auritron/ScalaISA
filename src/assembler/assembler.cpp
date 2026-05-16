@@ -34,13 +34,14 @@ void Assembler::assemble_prog(instruction_mod::Pipeline& pipeline, const std::st
         } 
         for (int inst_no{0}; inst_no < pipeline.size(); ++inst_no) {
             auto analyze_success = analyzer.analyze(pipeline[inst_no]);
-            if (!analyze_success) { 
+            if (!analyze_success) { //debug
                 if (!error_detected) error_detected = true; 
                 log_error(analyze_success.error()); 
                 std::cout << "INVALID\n";
             } else {
                 std::cout << "VALID\n";
             };
+            analyzer.RI_inst_classify(pipeline[inst_no]);
         }
     }
 

@@ -8,7 +8,7 @@
 ## I-instruction
 - Register + Immediate  
 - OPCODE REG (REG) IMM  
-- SET, NOT, AND, OR, XOR, STL, STR, RTL, RTR, ADD, SUB, MUL, DIV, MOD, CMP
+- SET, NOT, AND, OR, XOR, STL, STR, RTL, RTR, NEG, ADD, SUB, MUL, DIV, MOD, CMP
 
 ## M-instruction
 - Memory Management  
@@ -133,6 +133,7 @@ CLR
 - STR - 001 00101  
 - RTL - 001 00110  
 - RTR - 001 00111  
+- NEG - 001 01000  
 - ADD - 001 01010  
 - SUB - 001 01011  
 - MUL - 001 01100  

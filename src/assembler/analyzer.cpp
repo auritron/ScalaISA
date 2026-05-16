@@ -1,6 +1,8 @@
 #include "analyzer.hpp"
 #include "../overload.hpp"
 
+#include <iostream>
+
 using instruction_mod::OpCode;
 using TT = instruction_mod::TokenType;
 
@@ -227,5 +229,21 @@ namespace analyzer_mod {
         }
         return {};
     };
+
+    void Analyzer::RI_inst_classify(instruction_mod::Inst& inst) const {
+        if (inst.inst_type == instruction_mod::InstType::RI) {
+            if (inst.used_size == 3) {
+                const auto& last_token_type = inst.token_arr[2].value().token_type;
+                if (last_token_type == instruction_mod::TokenType::Register) inst.inst_type = instruction_mod::InstType::R;
+                else if (last_token_type == instruction_mod::TokenType::Immediate) inst.inst_type = instruction_mod::InstType::I;
+                else std::abort();
+            } else if (inst.used_size == 4) {
+                const auto& last_token_type = inst.token_arr[3].value().token_type;
+                if (last_token_type == instruction_mod::TokenType::Register) inst.inst_type = instruction_mod::InstType::R;
+                else if (last_token_type == instruction_mod::TokenType::Immediate) inst.inst_type = instruction_mod::InstType::I;
+                else std::abort();
+            } else { std::abort(); /*shouldn't happen*/ }
+        }
+    }
 
 }
