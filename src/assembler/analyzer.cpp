@@ -18,9 +18,7 @@ namespace analyzer_mod {
     inline Fmt Reg() { return DefineFmt( OPT(TT::Register), std::nullopt, std::nullopt ); }
     inline Fmt RegAdr() { return DefineFmt( OPT(TT::Register), OPT({TT::Address, TT::Variable}), std::nullopt ); }
     inline Fmt RegRgI() { return DefineFmt( OPT(TT::Register), OPT({TT::Register, TT::Immediate}), std::nullopt); }
-    inline Fmt RgIRgI() { return DefineFmt( OPT({TT::Register, TT::Immediate}), OPT({TT::Register, TT::Immediate}), std::nullopt); }
     inline Fmt RegRegRgI() { return DefineFmt( OPT(TT::Register), OPT(TT::Register), OPT({TT::Register, TT::Immediate}) ); }
-    inline Fmt RegRgIRgI() { return DefineFmt( OPT(TT::Register), OPT({TT::Register, TT::Immediate}), OPT({TT::Register, TT::Immediate}) ); }
     inline Fmt Lbl() { return DefineFmt( OPT(TT::Label), std::nullopt, std::nullopt); }
 
     inline const InstructionFmt instruction_fmt {
@@ -32,9 +30,9 @@ namespace analyzer_mod {
 
         //  bitwise
         { OpCode::NOT,  RegRgI() },
-        { OpCode::AND,  RegRgIRgI() },
-        { OpCode::OR,   RegRgIRgI() },
-        { OpCode::XOR,  RegRgIRgI() },
+        { OpCode::AND,  RegRegRgI() },
+        { OpCode::OR,   RegRegRgI() },
+        { OpCode::XOR,  RegRegRgI() },
 
         //  shift and rotation
         { OpCode::STL,  RegRegRgI() },
@@ -44,14 +42,14 @@ namespace analyzer_mod {
 
         //  arithmetic
         { OpCode::NEG,  RegRgI() },
-        { OpCode::ADD,  RegRgIRgI() },
-        { OpCode::SUB,  RegRgIRgI() },
-        { OpCode::MUL,  RegRgIRgI() },
-        { OpCode::DIV,  RegRgIRgI() },
-        { OpCode::MOD,  RegRgIRgI() },
+        { OpCode::ADD,  RegRegRgI() },
+        { OpCode::SUB,  RegRegRgI() },
+        { OpCode::MUL,  RegRegRgI() },
+        { OpCode::DIV,  RegRegRgI() },
+        { OpCode::MOD,  RegRegRgI() },
 
         // comparison and branching
-        { OpCode::CMP,  RgIRgI() },
+        { OpCode::CMP,  RegRgI() },
         { OpCode::GOTO, Lbl() },
         { OpCode::WEQ,  Lbl() },
         { OpCode::WNE,  Lbl() },
@@ -180,8 +178,6 @@ namespace analyzer_mod {
                         const auto& tkn_val_res = validate_token(cur_token.value());
                         if (!tkn_val_res) { 
                             return tkn_val_res;
-                        } else {
-                            //...
                         }
                     }
                 }
@@ -198,7 +194,7 @@ namespace analyzer_mod {
         
     }
 
-    //anal
+    //analyzer
     std::expected<void, SemErr> Analyzer::analyze(instruction_mod::Inst& inst) const {
         const auto& first_token = inst.token_arr[0];
         if (!first_token.has_value()) { //check if first token exists, should not happen ideally but still
