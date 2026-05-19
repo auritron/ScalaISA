@@ -176,9 +176,7 @@ namespace analyzer_mod {
                         return std::unexpected(SemErr::IncorrectOperandFmt);
                     } else {
                         const auto& tkn_val_res = validate_token(cur_token.value());
-                        if (!tkn_val_res) { 
-                            return tkn_val_res;
-                        }
+                        if (!tkn_val_res) return tkn_val_res;
                     }
                 }
 

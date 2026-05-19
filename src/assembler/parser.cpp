@@ -1,5 +1,8 @@
 #include "parser.hpp"
 #include "../overload.hpp"
+#include <magic_enum/magic_enum.hpp>
+
+#include <iostream>
 
 namespace parser_mod {
 
@@ -407,6 +410,7 @@ namespace parser_mod {
     std::expected<void, ParseErr> Parser::parse(instruction_mod::Pipeline& pipeline, char current_char) {
 
         cur_ch = current_char;
+        std::optional<ParseErr> pending_error = std::nullopt;
 
         if (cur_state != State::Err && cur_state != State::Cmt) {
             auto result = set_state()
@@ -416,7 +420,7 @@ namespace parser_mod {
             if (!result) {
                 cur_state = State::Err;
                 buffer.clear();
-                return std::unexpected<ParseErr>(result.error());
+                pending_error = result.error();
             }
         }
 
@@ -428,24 +432,16 @@ namespace parser_mod {
             ++line_count;
             col_count = 0;
             cur_state = State::Nil;
+            prev_state = State::Nil;
         } else {
             ++col_count;
         }
 
         prev_state = cur_state;
 
-        return {};
-    }
+        if (pending_error) return std::unexpected(*pending_error);
 
-    //helpers
-    bool Parser::inst_type_already_opcode() {
-        switch (cur_inst.inst_type) {
-            case instruction_mod::InstType::LBL:
-            case instruction_mod::InstType::INV:
-                return false;
-            default:
-                return true;
-        }
+        return {};
     }
 
 }
