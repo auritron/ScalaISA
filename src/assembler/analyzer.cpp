@@ -75,12 +75,8 @@ namespace analyzer_mod {
 
     };
 
-    Analyzer::Analyzer() :
-        label_table{}
-    { }
-
     //scouting labels as first pass
-    std::expected<void, SemErr> Analyzer::scout_lbl(instruction_mod::Inst& inst) {
+    std::expected<void, SemErr> Analyzer::scout_lbl(instruction_mod::Inst& inst, std::unordered_set<std::string>& label_table) {
         auto& first_token{inst.token_arr[0]};
         bool label_too_long {false};
         if (inst.used_size > 1) label_too_long = true;
@@ -93,7 +89,7 @@ namespace analyzer_mod {
                         return std::unexpected(SemErr::LabelTooLongError); //if extra operands apart from just the label
                     } else {
                         return std::visit(overload{
-                            [this, &inst](std::string val) -> std::expected<void, SemErr> {
+                            [this, &inst, &label_table](std::string val) -> std::expected<void, SemErr> {
                                 auto [_, result] = label_table.insert(val);
                                 if (!result) {
                                     return std::unexpected(SemErr::LabelAlreadyExists);
@@ -116,7 +112,7 @@ namespace analyzer_mod {
     }
 
     //validate specific tokens to see if they are within constraints, only checked for positions 2 to INSTSIZE
-    std::expected<void, SemErr> Analyzer::validate_token(const instruction_mod::Token& token) const {
+    std::expected<void, SemErr> Analyzer::validate_token(const instruction_mod::Token& token, const std::unordered_set<std::string>& label_table) const {
         return std::visit(overload{
             [&token](OpCode) -> std::expected<void, SemErr> { //shouldn't happen ideally
                 return std::unexpected(SemErr::InvalidOpCodePosition);
@@ -146,7 +142,7 @@ namespace analyzer_mod {
                         return std::unexpected(SemErr::UnknownSemanticError);
                 }
             },
-            [this, &token](std::string tkn_s) -> std::expected<void, SemErr> { 
+            [this, &token, &label_table](std::string tkn_s) -> std::expected<void, SemErr> { 
                 switch (token.token_type) {
                     case TT::Label:
                         if (label_table.contains(tkn_s)) {
@@ -164,7 +160,7 @@ namespace analyzer_mod {
     }
 
     //validates opcodes and assigns them respective types accordingly
-    std::expected<void, SemErr> Analyzer::validate_opcode(instruction_mod::Inst& inst, instruction_mod::OpCode opcode) const {
+    std::expected<void, SemErr> Analyzer::validate_opcode(instruction_mod::Inst& inst, instruction_mod::OpCode opcode, const std::unordered_set<std::string>& label_table) const {
 
         const auto opc_pattern = instruction_fmt.find(opcode);
         if (opc_pattern == instruction_fmt.end()) {
@@ -181,7 +177,7 @@ namespace analyzer_mod {
                     if (!cur_target->token_type_exists(cur_token->token_type)) {
                         return std::unexpected(SemErr::IncorrectOperandFmt);
                     } else {
-                        const auto& tkn_val_res = validate_token(cur_token.value());
+                        const auto& tkn_val_res = validate_token(cur_token.value(), label_table);
                         if (!tkn_val_res) return tkn_val_res;
                     }
                 }
@@ -199,7 +195,7 @@ namespace analyzer_mod {
     }
 
     //analyzer
-    std::expected<void, SemErr> Analyzer::analyze(instruction_mod::Inst& inst) const {
+    std::expected<void, SemErr> Analyzer::analyze(instruction_mod::Inst& inst, const std::unordered_set<std::string>& label_table) const {
         const auto& first_token = inst.token_arr[0];
         if (!first_token.has_value()) { //check if first token exists, should not happen ideally but still
             return std::unexpected(SemErr::MissingOpCodeError);
@@ -207,8 +203,8 @@ namespace analyzer_mod {
             switch(first_token->token_type) {
                 case TT::OpCode: {
                     auto is_matched = std::visit(overload{
-                        [this, &inst](instruction_mod::OpCode oc) -> std::expected<void, SemErr> {
-                            return validate_opcode(inst, oc);
+                        [this, &inst, &label_table](instruction_mod::OpCode oc) -> std::expected<void, SemErr> {
+                            return validate_opcode(inst, oc, label_table);
                         },
                         [](auto a) -> std::expected<void, SemErr> { 
                             std::abort(); 

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vector>
+#include <unordered_set>
 #include <iostream>
 #include <magic_enum/magic_enum.hpp> //debugging
 
@@ -20,6 +21,7 @@ namespace assembler_mod {
 
         public:
             instruction_mod::Pipeline instruction_pipeline;
+            std::unordered_set<std::string> label_table;
 
             Assembler();
             void assemble_prog(instruction_mod::Pipeline& pipeline, const std::string& file);
