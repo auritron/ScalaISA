@@ -1,5 +1,6 @@
 #include "analyzer.hpp"
 #include "../overload.hpp"
+#include "../panic.hpp"
 
 using instruction_mod::OpCode;
 using TT = instruction_mod::TokenType;
@@ -98,7 +99,7 @@ namespace analyzer_mod {
                                 return {};
                             },
                             [this](auto) -> std::expected<void, SemErr> {
-                                std::abort();
+                                panic::panic();
                                 return std::unexpected(SemErr::UnknownSemanticError);
                             }
                         }, first_token->value);
@@ -138,7 +139,7 @@ namespace analyzer_mod {
                             return {};
                         }
                     default:
-                        std::abort(); //unreachable
+                        panic::panic(); //unreachable
                         return std::unexpected(SemErr::UnknownSemanticError);
                 }
             },
@@ -152,7 +153,7 @@ namespace analyzer_mod {
                     case TT::Variable:
                         return {}; //no further verification required
                     default:
-                        std::abort(); //unreachable
+                        panic::panic(); //unreachable
                         return std::unexpected(SemErr::UnknownSemanticError);
                 }    
             },
@@ -164,7 +165,7 @@ namespace analyzer_mod {
 
         const auto opc_pattern = instruction_fmt.find(opcode);
         if (opc_pattern == instruction_fmt.end()) {
-            std::abort(); //change this to a panic function with error message.
+            panic::panic(); //change this to a panic function with error message.
         } else { 
             for (int tkn{1}; tkn < instruction_mod::Inst::INST_SIZE; ++tkn) {
 
@@ -207,7 +208,7 @@ namespace analyzer_mod {
                             return validate_opcode(inst, oc, label_table);
                         },
                         [](auto a) -> std::expected<void, SemErr> { 
-                            std::abort(); 
+                            panic::panic(); 
                             return std::unexpected(SemErr::UnknownSemanticError); 
                         }, //shouldn't happen
                     }, first_token->value);
@@ -231,13 +232,13 @@ namespace analyzer_mod {
                 const auto& last_token_type = inst.token_arr[2].value().token_type;
                 if (last_token_type == instruction_mod::TokenType::Register) inst.inst_type = instruction_mod::InstType::R;
                 else if (last_token_type == instruction_mod::TokenType::Immediate) inst.inst_type = instruction_mod::InstType::I;
-                else std::abort();
+                else panic::panic();
             } else if (inst.used_size == 4) {
                 const auto& last_token_type = inst.token_arr[3].value().token_type;
                 if (last_token_type == instruction_mod::TokenType::Register) inst.inst_type = instruction_mod::InstType::R;
                 else if (last_token_type == instruction_mod::TokenType::Immediate) inst.inst_type = instruction_mod::InstType::I;
-                else std::abort();
-            } else { std::abort(); /*shouldn't happen*/ }
+                else panic::panic();
+            } else { panic::panic(); /*shouldn't happen*/ }
         }
     }
 

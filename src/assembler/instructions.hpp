@@ -143,4 +143,6 @@ namespace instruction_mod {
 
     using Pipeline = std::vector<Inst>;
 
+    void panic();
+
 }

@@ -1,5 +1,6 @@
 #include "parser.hpp"
 #include "../overload.hpp"
+#include "../panic.hpp"
 #include <magic_enum/magic_enum.hpp>
 
 #include <iostream>
@@ -70,7 +71,7 @@ namespace parser_mod {
                 case State::Err:
                     break;
                 case State::Cmt:
-                    std::abort();
+                    panic::panic();
 
             }
 
@@ -102,7 +103,7 @@ namespace parser_mod {
                 case State::Err:
                     break;
                 case State::Cmt:
-                    std::abort();
+                    panic::panic();
                 default:
                     break;
             }
@@ -134,7 +135,7 @@ namespace parser_mod {
                 case State::Err:
                     break;
                 case State::Cmt:
-                    std::abort();
+                    panic::panic();
             }
 
         } else if (cur_ch == '#') {
@@ -164,7 +165,7 @@ namespace parser_mod {
                 case State::Err:
                     break;
                 case State::Cmt:
-                    std::abort();
+                    panic::panic();
             }
 
         } else if (cur_ch == '_') {
@@ -194,7 +195,7 @@ namespace parser_mod {
                 case State::Err:
                     break;
                 case State::Cmt:
-                    std::abort();
+                    panic::panic();
             }
             
         } else if (std::isdigit(cur_ch)) {
@@ -232,7 +233,7 @@ namespace parser_mod {
                 case State::Err:
                     break;
                 case State::Cmt:
-                    std::abort();
+                    panic::panic();
             }
 
         } else if (std::isalpha(cur_ch)) {
@@ -266,7 +267,7 @@ namespace parser_mod {
                 case State::Err:
                     break;
                 case State::Cmt:
-                    std::abort();
+                    panic::panic();
                 
             }
 
@@ -391,7 +392,7 @@ namespace parser_mod {
                     token = instruction_mod::Token(instruction_mod::TokenType::Label, buffer.substr(1));
                     break;
                 default:
-                    std::abort();
+                    panic::panic();
             }
             
             if (!cur_inst.push_token(std::move(token))) return std::unexpected(ParseErr::InstructionTooLong); //move happens here 
