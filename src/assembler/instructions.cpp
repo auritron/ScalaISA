@@ -113,6 +113,7 @@ namespace instruction_mod {
     Inst::Inst() :
         token_arr{std::nullopt},
         used_size{0},
+        inst_no{std::nullopt},
         inst_type{InstType::INV}
     { }
 

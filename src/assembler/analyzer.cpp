@@ -76,8 +76,12 @@ namespace analyzer_mod {
 
     };
 
+    Analyzer::Analyzer() :
+        priv_inst_count{0}
+    { }
+
     //scouting labels as first pass
-    std::expected<void, SemErr> Analyzer::scout_lbl(instruction_mod::Inst& inst, std::unordered_set<std::string>& label_table) {
+    std::expected<void, SemErr> Analyzer::scout_lbl(instruction_mod::Inst& inst, std::unordered_map<std::string, size_t>& label_table) const {
         auto& first_token{inst.token_arr[0]};
         bool label_too_long {false};
         if (inst.used_size > 1) label_too_long = true;
@@ -91,7 +95,7 @@ namespace analyzer_mod {
                     } else {
                         return std::visit(overload{
                             [this, &inst, &label_table](std::string val) -> std::expected<void, SemErr> {
-                                auto [_, result] = label_table.insert(val);
+                                auto [_, result] = label_table.insert(std::make_pair(val, priv_inst_count+1));
                                 if (!result) {
                                     return std::unexpected(SemErr::LabelAlreadyExists);
                                 }
@@ -113,7 +117,7 @@ namespace analyzer_mod {
     }
 
     //validate specific tokens to see if they are within constraints, only checked for positions 2 to INSTSIZE
-    std::expected<void, SemErr> Analyzer::validate_token(const instruction_mod::Token& token, const std::unordered_set<std::string>& label_table) const {
+    std::expected<void, SemErr> Analyzer::validate_token(const instruction_mod::Token& token, const std::unordered_map<std::string, size_t>& label_table) const {
         return std::visit(overload{
             [&token](OpCode) -> std::expected<void, SemErr> { //shouldn't happen ideally
                 return std::unexpected(SemErr::InvalidOpCodePosition);
@@ -161,7 +165,7 @@ namespace analyzer_mod {
     }
 
     //validates opcodes and assigns them respective types accordingly
-    std::expected<void, SemErr> Analyzer::validate_opcode(instruction_mod::Inst& inst, instruction_mod::OpCode opcode, const std::unordered_set<std::string>& label_table) const {
+    std::expected<void, SemErr> Analyzer::validate_opcode(instruction_mod::Inst& inst, instruction_mod::OpCode opcode, const std::unordered_map<std::string, size_t>& label_table) const {
 
         const auto opc_pattern = instruction_fmt.find(opcode);
         if (opc_pattern == instruction_fmt.end()) {
@@ -196,13 +200,14 @@ namespace analyzer_mod {
     }
 
     //analyzer
-    std::expected<void, SemErr> Analyzer::analyze(instruction_mod::Inst& inst, const std::unordered_set<std::string>& label_table) const {
+    std::expected<void, SemErr> Analyzer::analyze(instruction_mod::Inst& inst, const std::unordered_map<std::string, size_t>& label_table) {
         const auto& first_token = inst.token_arr[0];
         if (!first_token.has_value()) { //check if first token exists, should not happen ideally but still
             return std::unexpected(SemErr::MissingOpCodeError);
         } else {
             switch(first_token->token_type) {
                 case TT::OpCode: {
+                    inst.inst_no = priv_inst_count++;
                     auto is_matched = std::visit(overload{
                         [this, &inst, &label_table](instruction_mod::OpCode oc) -> std::expected<void, SemErr> {
                             return validate_opcode(inst, oc, label_table);
@@ -226,6 +231,7 @@ namespace analyzer_mod {
         return {};
     };
 
+    //classifying RI instructions as R and I
     void Analyzer::RI_inst_classify(instruction_mod::Inst& inst) const {
         if (inst.inst_type == instruction_mod::InstType::RI) {
             if (inst.used_size == 3) {

@@ -28,6 +28,7 @@ namespace parser_mod {
         prev_state{State::Nil},
         cur_action{Action::Idle},
         buffer{""},
+        inst_count{0},
         cur_inst(),
         cur_ch{0},
         ch_count{0},

@@ -54,6 +54,7 @@ namespace parser_mod {
             State prev_state;
             Action cur_action;
             std::string buffer;
+            size_t inst_count;
             instruction_mod::Inst cur_inst;
             unsigned char cur_ch;
             size_t ch_count;    //characters counted from input

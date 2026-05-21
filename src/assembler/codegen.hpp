@@ -19,7 +19,6 @@ namespace codegen_mod {
 
             CodeGen();
             int generate(const instruction_mod::Inst& inst);
-            //TODO - ADD INSTRUCTION COUNT FIELD TO INSTRUCTION STRUCT!!!
 
     };
 

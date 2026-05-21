@@ -134,6 +134,7 @@ namespace instruction_mod {
             static constexpr int MAX_IMM_VAL = 65535;
             size_t used_size;
             InstType inst_type;
+            std::optional<size_t> inst_no;
             std::array<std::optional<Token>, INST_SIZE> token_arr;
 
             Inst();
@@ -142,7 +143,5 @@ namespace instruction_mod {
     };
 
     using Pipeline = std::vector<Inst>;
-
-    void panic();
 
 }
